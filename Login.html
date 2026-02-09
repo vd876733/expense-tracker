@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Advanced Expense Tracker</title>
+    <link rel="stylesheet" href="Login.css">
+</head>
+<body>
+    <div class="login-main-row">
+      <div class="login-container">
+        <form class="login-form" id="login-form">
+          <div class="login-title-row">
+            <div class="bulb-toggle" id="bulb-toggle" title="Toggle dark/light mode">
+              <svg id="bulb-svg" width="60" height="90" style="overflow:visible;" xmlns="http://www.w3.org/2000/svg">
+                <g id="bulb-body-group">
+                  <circle id="bulb-body" cx="30" cy="22" r="28" />
+                  <text id="bulb-icon" x="30" y="32" text-anchor="middle" font-size="36">💡</text>
+                </g>
+                <line id="bulb-cord" x1="30" y1="50" x2="30" y2="88" stroke="#bdbdbd" stroke-width="4" stroke-linecap="round" />
+                <circle id="bulb-cord-knob" cx="30" cy="88" r="9" fill="#facc15" stroke="#bdbdbd" stroke-width="3" style="cursor:grab;" />
+              </svg>
+            </div>
+            <h2 class="login-title" id="auth-title">Sign In</h2>
+          </div>
+
+          <div class="auth-switch" style="text-align:center;margin-bottom:0.8rem;">
+            <a href="#" id="toggle-to-signup">New user? Sign up</a>
+            <span style="margin:0 0.5rem;color:#888;">|</span>
+            <a href="#" id="toggle-to-signin" style="display:none;">Already have an account? Sign in</a>
+          </div>
+
+          <div id="auth-fields">
+            <div class="form-group" id="fullname-group" style="display:none;">
+                <label for="fullname">Full name</label>
+                <input type="text" id="fullname" name="fullname" autocomplete="name">
+            </div>
+            <div class="form-group">
+                <label for="username">Email</label>
+                <input type="email" id="username" name="username" required autocomplete="username" placeholder="you@example.com">
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required autocomplete="current-password">
+            </div>
+            <div class="form-group" id="confirm-group" style="display:none;">
+                <label for="password-confirm">Confirm password</label>
+                <input type="password" id="password-confirm" name="password-confirm" autocomplete="new-password">
+            </div>
+            <input type="hidden" id="auth-mode" value="signin">
+            <button type="submit" class="login-btn" id="auth-submit">Login</button>
+            <div id="login-error" class="login-error" style="display:none;margin-top:0.6rem;"></div>
+          </div>
+        </form>
+      </div>
+      <div class="login-scenery">
+        <svg id="scenery-svg" width="100%" height="260" viewBox="0 0 400 260" style="display:block; width:100%; max-width:400px; margin:0 auto;">
+          <!-- Sun (light mode) -->
+          <circle id="scenery-sun" cx="-40" cy="70" r="32" fill="#ffe066" stroke="#facc15" stroke-width="6" />
+          <!-- Clouds (both modes) -->
+          <ellipse id="cloud1" cx="90" cy="80" rx="38" ry="18" fill="#fff" opacity="0.85" />
+          <ellipse id="cloud2" cx="140" cy="110" rx="28" ry="13" fill="#fff" opacity="0.7" />
+          <ellipse id="cloud3" cx="200" cy="70" rx="22" ry="10" fill="#fff" opacity="0.6" />
+          <!-- Moon (dark mode) -->
+          <circle id="scenery-moon" cx="-40" cy="70" r="26" fill="#f3f4f6" stroke="#cbd5e1" stroke-width="5" style="opacity:0;" />
+          <!-- Stars (dark mode) -->
+          <g id="scenery-stars" style="opacity:0;">
+            <circle cx="60" cy="50" r="2.2" fill="#fff"/>
+            <circle cx="110" cy="40" r="1.5" fill="#fff"/>
+            <circle cx="180" cy="75" r="1.8" fill="#fff"/>
+            <circle cx="250" cy="45" r="1.2" fill="#fff"/>
+            <circle cx="360" cy="60" r="2.5" fill="#fff"/>
+            <circle cx="300" cy="35" r="1.3" fill="#fff"/>
+          </g>
+          <!-- Realistic Trees (SVG paths) -->
+          <g id="scenery-trees">
+            <!-- Tree 1 -->
+            <rect id="tree1-trunk" x="60" y="170" width="14" height="50" rx="5" fill="#7c4700" />
+            <path id="tree1-leaves" d="M67 170 Q55 150 67 140 Q79 150 67 170 Z" fill="#388e3c" />
+            <!-- Tree 2 -->
+            <rect id="tree2-trunk" x="140" y="180" width="12" height="40" rx="4" fill="#7c4700" />
+            <ellipse id="tree2-leaves" cx="146" cy="180" rx="18" ry="16" fill="#43a047" />
+            <!-- Tree 3 -->
+            <rect id="tree3-trunk" x="220" y="175" width="10" height="45" rx="4" fill="#7c4700" />
+            <path id="tree3-leaves" d="M225 175 Q215 160 225 150 Q235 160 225 175 Z" fill="#388e3c" />
+          </g>
+          <!-- Ground -->
+          <ellipse cx="200" cy="240" rx="180" ry="22" fill="#e0e7ef" opacity="0.7" />
+        </svg>
+      </div>
+    </div>
+        
+    <script src="Login.js"></script>
+    <script>
+    // Scenery theme sync, sun/moon animation, and tree sway physics
+    let sunX = -40, moonX = 320;
+    let animating = false;
+    let treeSwayPhase = 0;
+    const SUN_STOP_X = 320; // Where sun stops in light mode
+    const MOON_START_X = 320; // Where moon starts in dark mode
+    const MOON_END_X = 440; // Where moon sets (off screen)
+
+    function animateScenery() {
+      const isDark = document.body.classList.contains('login-dark');
+      if (!animating) return;
+      if (!isDark) {
+        // Sun rises and stops at SUN_STOP_X
+        if (sunX < SUN_STOP_X) {
+          sunX += 2.2;
+          if (sunX > SUN_STOP_X) sunX = SUN_STOP_X;
+          document.getElementById('scenery-sun').setAttribute('cx', sunX);
+          requestAnimationFrame(animateScenery);
+        } else {
+          document.getElementById('scenery-sun').setAttribute('cx', SUN_STOP_X);
+        }
+        document.getElementById('scenery-sun').style.opacity = 1;
+        document.getElementById('scenery-moon').style.opacity = 0;
+      } else {
+        // Moon sets (moves right and fades out)
+        if (moonX < MOON_END_X) {
+          moonX += 2.2;
+          document.getElementById('scenery-moon').setAttribute('cx', moonX);
+          document.getElementById('scenery-moon').style.opacity = 1 - ((moonX - MOON_START_X) / (MOON_END_X - MOON_START_X));
+          requestAnimationFrame(animateScenery);
+        } else {
+          document.getElementById('scenery-moon').style.opacity = 0;
+        }
+        document.getElementById('scenery-sun').style.opacity = 0;
+      }
+      // Clouds always visible
+      document.getElementById('cloud1').style.opacity = 0.85;
+      document.getElementById('cloud2').style.opacity = 0.7;
+      document.getElementById('cloud3').style.opacity = 0.6;
+      // Stars
+      document.getElementById('scenery-stars').style.opacity = isDark ? 1 : 0;
+      // Tree sway physics (wind effect)
+      treeSwayPhase += 0.04;
+      const sway1 = Math.sin(treeSwayPhase) * 4;
+      const sway2 = Math.sin(treeSwayPhase + 1.2) * 3;
+      const sway3 = Math.sin(treeSwayPhase + 2.1) * 5;
+      document.getElementById('tree1-leaves').setAttribute('transform', `rotate(${sway1},67,155)`);
+      document.getElementById('tree2-leaves').setAttribute('transform', `rotate(${sway2},146,172)`);
+      document.getElementById('tree3-leaves').setAttribute('transform', `rotate(${sway3},225,162)`);
+    }
+
+    function startSceneryAnimation() {
+      const isDark = document.body.classList.contains('login-dark');
+      animating = true;
+      if (!isDark) {
+        sunX = -40;
+        document.getElementById('scenery-sun').setAttribute('cx', sunX);
+        document.getElementById('scenery-sun').style.opacity = 1;
+        document.getElementById('scenery-moon').style.opacity = 0;
+        animateScenery();
+      } else {
+        moonX = MOON_START_X;
+        document.getElementById('scenery-moon').setAttribute('cx', moonX);
+        document.getElementById('scenery-moon').style.opacity = 1;
+        document.getElementById('scenery-sun').style.opacity = 0;
+        animateScenery();
+      }
+    }
+
+    function updateScenery() {
+      // Called on theme change
+      startSceneryAnimation();
+    }
+    document.addEventListener('DOMContentLoaded', updateScenery);
+    const observer = new MutationObserver(updateScenery);
+    observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+    </script>
+</body>
+</body>
+<!-- Cash with wings follower -->
+<div id="cash-fly" style="
+  position: fixed;
+  left: 0; top: 0;
+  pointer-events: none;
+  z-index: 9999;
+  font-size: 2.5rem;
+  user-select: none;
+  transition: filter 0.2s;
+">💸</div>
+<script>
+  // Cash with wings emoji follows cursor with lag and slow flutter
+  (function() {
+    const cash = document.getElementById('cash-fly');
+    let mouseX = window.innerWidth / 2, mouseY = window.innerHeight / 2;
+    let cashX = mouseX, cashY = mouseY;
+    const lag = 0.02; // Strong lag for trailing effect
+    let flutter = 0;
+    function animate() {
+      cashX += (mouseX - cashX) * lag;
+      cashY += (mouseY - cashY) * lag;
+      // Flutter: rotate back and forth, slow
+      flutter += 0.08; // SLOW flutter
+      const angle = Math.sin(flutter) * 18; // degrees
+      cash.style.transform = `translate(-50%, -50%) translate(${cashX}px, ${cashY}px) rotate(${angle}deg)`;
+      requestAnimationFrame(animate);
+    }
+    window.addEventListener('mousemove', e => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+    });
+    // Start centered
+    cash.style.transform = `translate(-50%, -50%) translate(${cashX}px, ${cashY}px)`;
+    animate();
+  })();
+</script>
+</html>

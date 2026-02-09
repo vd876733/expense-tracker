@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pending Debts - Track Money Owed</title>
+  <link rel="stylesheet" href="pending.css">
+</head>
+<body>
+  <a href="index.html" class="back-link" style="
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 2rem auto 0.5rem 2vw;
+    padding: 0.5rem 1.2rem;
+    background: var(--primary, #2563eb);
+    color: var(--primary-foreground, #fff);
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 1rem;
+    text-decoration: none;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    transition: background 0.2s, color 0.2s, transform 0.2s;
+    border: none;
+    cursor: pointer;
+  " title="Back to main page">
+    <span style="font-size:1.2rem;">←</span> Back
+  </a>
+  <div class="pending-container">
+    <div class="pending-title">Who Owes You? <span>💸</span>
+      <button id="pending-theme-toggle" class="theme-toggle" title="Toggle dark mode" style="margin-left:0.7rem; position:static; width: 40px; height: 40px; box-shadow: none; background: rgba(255,255,255,0.2); border: 1px solid rgba(0,0,0,0.08); display: flex; align-items: center; justify-content: center;">
+        <span id="pending-theme-icon" style="font-size: 1.3rem;">🌙</span>
+      </button>
+    </div>
+    <div class="pending-subtitle">Track money others owe you and see who, how much, why, when it’s due, and whether it’s paid yet.</div>
+    <form class="pending-form" id="pending-form">
+      <div class="form-group">
+        <label for="person">Person Name</label>
+        <input type="text" id="person" required placeholder="John Doe">
+      </div>
+      <div class="form-group">
+        <label for="amount">Amount</label>
+        <input type="number" id="amount" required min="0.01" step="0.01" placeholder="₹20.00">
+      </div>
+      <div class="form-group">
+        <label for="due">Paid Date</label>
+        <input type="date" id="due" required>
+      </div>
+      <div class="form-group">
+        <label for="reason">Reason</label>
+        <input type="text" id="reason" required placeholder="Dinner split">
+      </div>
+      <div class="form-group">
+        <label for="status">Status</label>
+        <select id="status" required>
+          <option value="Pending">Pending</option>
+          <option value="Paid">Paid</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="notes">Notes <span style="color:#aaa;font-weight:400;">(optional)</span></label>
+        <input type="text" id="notes" placeholder="Paid partially">
+      </div>
+      <button type="submit">Add</button>
+    </form>
+    <table class="pending-table" id="pending-table">
+      <thead>
+        <tr>
+          <th>Person</th>
+          <th>Amount (₹)</th>
+          <th>Paid Date</th>
+          <th>Reason</th>
+          <th>Status</th>
+          <th>Notes</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="pending-tbody">
+        <!-- Records will appear here -->
+      </tbody>
+    </table>
+  </div>
+  <script src="pending.js"></script>
+  <!-- Cash Fly Emoji Cursor -->
+  <div id="cash-fly" style="
+    position: fixed;
+    left: 0; top: 0;
+    pointer-events: none;
+    z-index: 9999;
+    font-size: 2.1rem;
+    filter: drop-shadow(0 2px 6px rgba(0,0,0,0.13));
+    transition: filter 0.2s;
+    will-change: transform;
+  ">💸</div>
+  <script>
+    // Dark mode toggle logic for pending.html
+    const themeBtn = document.getElementById('pending-theme-toggle');
+    const themeIcon = document.getElementById('pending-theme-icon');
+    function setPendingTheme(dark) {
+      if (dark) {
+        document.body.classList.add('dark');
+        localStorage.setItem('pending-theme', 'dark');
+        themeIcon.textContent = '☀️';
+      } else {
+        document.body.classList.remove('dark');
+        localStorage.setItem('pending-theme', 'light');
+        themeIcon.textContent = '🌙';
+      }
+    }
+    // Initial theme
+    const savedTheme = localStorage.getItem('pending-theme');
+    if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      setPendingTheme(true);
+    } else {
+      setPendingTheme(false);
+    }
+    themeBtn.addEventListener('click', () => {
+      setPendingTheme(!document.body.classList.contains('dark'));
+    });
+    // --- Cash Fly Cursor Effect ---
+    (function() {
+      const cash = document.getElementById('cash-fly');
+      let mouseX = window.innerWidth/2, mouseY = window.innerHeight/2;
+      let flyX = mouseX, flyY = mouseY;
+      let flutterPhase = 0;
+      function lerp(a, b, t) { return a + (b - a) * t; }
+      document.addEventListener('mousemove', e => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+      });
+      function animate() {
+        // Slightly faster lag (small t = slow follow)
+        flyX = lerp(flyX, mouseX, 0.018);
+        flyY = lerp(flyY, mouseY, 0.018);
+        // Slower flutter effect
+        flutterPhase += 0.07;
+        const flutterY = Math.sin(flutterPhase) * 8;
+        const flutterX = Math.cos(flutterPhase * 1.7) * 3;
+        cash.style.transform = `translate3d(${flyX + flutterX}px, ${flyY + flutterY}px, 0)`;
+        requestAnimationFrame(animate);
+      }
+      animate();
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,231 @@
+
+/* Modern Card Style for Pending Debts (matches p1.html) */
+html:root {
+
+  --background: #99a6d9;
+  --foreground: #020817;
+  --card: #d4d2e8;
+  --card-foreground: #020817;
+  --primary: #2563eb;
+  --primary-foreground: #fff;
+  --secondary: #92b3d5;
+  --secondary-foreground: #030213;
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b;
+  --accent: #f1f5f9;
+  --accent-foreground: #030213;
+  --destructive: #dc2626;
+  --destructive-foreground: #fff;
+  --success: #16a34a;
+  --success-foreground: #fff;
+  --warning: #ca8a04;
+  --warning-foreground: #fff;
+  --info: #0891b2;
+  --info-foreground: #fff;
+  --border: #e2e8f0;
+  --input: #fff;
+  --input-background: #f8fafc;
+  --radius: 0.75rem;
+  --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+}
+
+body.dark, html.dark {
+  --background: #020617;
+  --foreground: #f8fafc;
+  --card: #0f172a;
+  --card-foreground: #f8fafc;
+  --primary: #3b82f6;
+  --primary-foreground: #fff;
+  --secondary: #1e293b;
+  --secondary-foreground: #f8fafc;
+  --muted: #1e293b;
+  --muted-foreground: #94a3b8;
+  --accent: #1e293b;
+  --accent-foreground: #f8fafc;
+  --destructive: #dc2626;
+  --destructive-foreground: #fff;
+  --success: #16a34a;
+  --success-foreground: #fff;
+  --warning: #ca8a04;
+  --warning-foreground: #fff;
+  --info: #0891b2;
+  --info-foreground: #fff;
+  --border: #334155;
+  --input: #1e293b;
+  --input-background: #0f172a;
+  --radius: 0.75rem;
+}
+
+.theme-toggle {
+  background: rgba(255,255,255,0.2);
+  border: 1px solid rgba(0,0,0,0.08);
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  position: absolute;
+  top: 1.2rem;
+  right: 1.2rem;
+  z-index: 10;
+}
+.theme-toggle span {
+  font-size: 1.5rem;
+  transition: transform 0.3s;
+}
+
+body {
+  background: linear-gradient(135deg, var(--background) 0%, var(--muted) 100%);
+  color: var(--foreground);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  min-height: 100vh;
+  margin: 0;
+}
+
+.pending-container {
+  max-width: 600px;
+  margin: 2.5rem auto;
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-md);
+  padding: 2.5rem 2rem 2rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.pending-title {
+  font-size: 2.1rem;
+  font-weight: 900;
+  color: var(--primary);
+  letter-spacing: 0.03em;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.2rem;
+}
+.pending-title span {
+  font-size: 2.2rem;
+  vertical-align: middle;
+}
+.pending-subtitle {
+  color: var(--muted-foreground);
+  font-size: 1.05rem;
+  margin-bottom: 1.5rem;
+}
+
+.pending-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.2rem;
+  margin-bottom: 1.5rem;
+  align-items: flex-end;
+}
+.pending-form .form-group {
+  flex: 1 1 180px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+.pending-form label {
+  font-size: 0.93rem;
+  font-weight: 700;
+  color: var(--foreground);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.pending-form input, .pending-form select {
+  padding: 0.7rem 1rem;
+  border-radius: calc(var(--radius) - 4px);
+  border: 2px solid var(--border);
+  background: var(--input-background);
+  color: var(--foreground);
+  font-size: 1rem;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+.pending-form input:focus, .pending-form select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(37,99,235,0.12);
+  background: var(--input);
+}
+.pending-form input::placeholder {
+  color: var(--muted-foreground);
+}
+.pending-form button {
+  padding: 0.7rem 1.5rem;
+  border-radius: calc(var(--radius) - 4px);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--card) 100%);
+  color: var(--primary-foreground);
+  border: none;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: var(--shadow-md);
+  letter-spacing: 0.04em;
+  margin-top: 0.5rem;
+}
+.pending-form button:hover {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--chart-1, #3b82f6) 100%);
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: var(--shadow-lg);
+}
+
+.pending-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1.5rem;
+  background: var(--card);
+  border-radius: calc(var(--radius) - 2px);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm, 0 1px 2px 0 rgba(0,0,0,0.05));
+}
+.pending-table th, .pending-table td {
+  padding: 0.85rem 0.7rem;
+  border-bottom: 1.5px solid var(--border);
+  text-align: left;
+}
+.pending-table th {
+  background: var(--muted);
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--primary);
+  letter-spacing: 0.03em;
+}
+.pending-table td.status-pending {
+  color: var(--warning);
+  font-weight: 700;
+}
+.pending-table td.status-paid {
+  color: var(--success);
+  font-weight: 700;
+}
+.pending-table td.notes {
+  font-size: 0.97rem;
+  color: var(--muted-foreground);
+}
+.pending-table tr:last-child td {
+  border-bottom: none;
+}
+
+@media (max-width: 700px) {
+  .pending-container {
+    padding: 1.2rem 0.5rem;
+    gap: 1.2rem;
+  }
+  .pending-form {
+    flex-direction: column;
+    gap: 0.7rem;
+  }
+  .pending-table th, .pending-table td {
+    font-size: 0.97rem;
+    padding: 0.7rem 0.4rem;
+  }
+}

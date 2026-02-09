@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Expense Tracker</title>
+    <link rel="stylesheet" href="home.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/date-fns@2.29.3/index.min.js"></script>
+</head>
+<body>
+    <div class="app">
+        <!-- Sidebar Navigation (fixed/constant) -->
+        <aside class="sidebar" id="sidebar">
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="#dashboard" class="sidebar-link"><span class="icon">🏠</span> Dashboard</a></li>
+                    <li><a href="#add-expense" class="sidebar-link"><span class="icon">➕</span> Add Expense</a></li>
+                    <li><a href="#analytics" class="sidebar-link"><span class="icon">📊</span> Analytics</a></li>
+                    <li><a href="#history" class="sidebar-link"><span class="icon">📋</span> History</a></li>
+                    <li><a href="#settings" class="sidebar-link"><span class="icon">⚙️</span> Settings</a></li>
+                    <li><a href="pending.html" class="sidebar-link"><span class="icon">🧾</span> Pending Bills</a></li>
+                    <li><a href="login.html" id="logout-btn" class="sidebar-link"><span class="icon">🚪</span> Logout</a></li>
+                </ul>
+            </nav>
+            <div class="sidebar-darkmode" style="padding: 1.5rem 0; display: flex; justify-content: center;">
+                <button id="theme-toggle" class="theme-toggle">
+                    <span id="theme-icon">🌙</span>
+                </button>
+            </div>
+            <!-- No script needed for logout link -->
+        </aside>
+        <div class="main-content" style="flex:1; height:100vh; overflow-y:auto;">
+            <!-- Sidebar Head moved to top of main content -->
+            <div class="sidebar-header" style="margin-bottom: 2rem;">
+                <div class="sidebar-title"><span class="icon">💸</span> Walleto: Advanced Expense Tracker</div>
+                <div class="sidebar-subtitle">Track and analyze your spending patterns</div>
+            </div>
+            <!-- Header with Dark Mode Toggle -->
+            <header class="header">
+                <div class="header-content">
+                    <div class="header-left">
+                        <!-- Removed cash emoji from header -->
+                        <div class="header-text">
+                            <!-- Subheading moved to sidebar -->
+                        </div>
+                    </div>
+                </div>
+            </header>
+            <div class="container with-sidebar">
+                <!-- Dashboard Section -->
+                <section id="dashboard"></section>
+                <!-- Add Expense Form -->
+                <section class="card expense-form-card" id="add-expense">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <span class="icon">➕</span>
+                        Add New Expense
+                    </h2>
+                </div>
+                <div class="card-content">
+                    <form id="expense-form" class="expense-form">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="expense-date">Date</label>
+                                <input type="date" id="expense-date" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="amount">Amount ($)</label>
+                                <input type="number" id="amount" step="0.01" placeholder="0.00" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="category">Category</label>
+                                <select id="category" required>
+                                    <option value="">Select category</option>
+                                    <option value="Food & Dining">Food & Dining</option>
+                                    <option value="Transportation">Transportation</option>
+                                    <option value="Shopping">Shopping</option>
+                                    <option value="Entertainment">Entertainment</option>
+                                    <option value="Bills & Utilities">Bills & Utilities</option>
+                                    <option value="Healthcare">Healthcare</option>
+                                    <option value="Education">Education</option>
+                                    <option value="Travel">Travel</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="description">Description</label>
+                                <input type="text" id="description" placeholder="Enter description" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="mode">Mode of Payment</label>
+                                <select id="mode" required>
+                                    <option value="">Select mode</option>
+                                    <option value="Cash">Cash</option>
+                                    <option value="Online">Online</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <span class="icon">➕</span>
+                            Add Expense
+                        </button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Budget Summary -->
+            <section class="budget-summary">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Total Spent</h3>
+                        <span class="icon">💰</span>
+                    </div>
+                    <div class="card-content">
+                        <div class="amount-display" id="total-spent">$0.00</div>
+                        <p class="text-muted" id="budget-percentage">0% of budget used</p>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Remaining Budget</h3>
+                        <span class="icon">🎯</span>
+                    </div>
+                    <div class="card-content">
+                        <div class="amount-display" id="remaining-budget">$500.00</div>
+                        <div class="budget-edit-section">
+                            <div class="budget-display" id="budget-display">
+                                <span class="text-muted">Budget: </span>
+                                <span id="budget-value">$500.00</span>
+                                <button id="edit-budget-btn" class="btn-icon" title="Edit Budget">
+                                    <span class="icon">✏️</span>
+                                </button>
+                            </div>
+                            <div class="budget-edit hidden" id="budget-edit">
+                                <div class="budget-input-group">
+                                    <input type="number" id="budget-input" step="0.01" placeholder="Enter budget">
+                                    <button id="save-budget-btn" class="btn btn-sm btn-primary">Save</button>
+                                    <button id="cancel-budget-btn" class="btn btn-sm btn-outline">Cancel</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">This Month</h3>
+                        <span class="icon">📅</span>
+                    </div>
+                    <div class="card-content">
+                        <div class="amount-display" id="month-spent">$0.00</div>
+                        <p class="text-muted" id="month-count">0 expenses</p>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- Analytics Controls -->
+            <section class="card analytics-controls" id="analytics">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <span class="icon">📊</span>
+                        Expense Analytics
+                    </h2>
+                </div>
+                <div class="card-content">
+                    <div class="controls-row">
+                        <div class="time-period-selector">
+                            <label>Time Period:</label>
+                            <div class="btn-group">
+                                <button class="btn btn-outline active" data-period="week">Week</button>
+                                <button class="btn btn-outline" data-period="month">Month</button>
+                                <button class="btn btn-outline" data-period="year">Year</button>
+                            </div>
+                        </div>
+                        
+                        <div class="date-range-filter">
+                            <label>Date Range:</label>
+                            <div class="date-inputs">
+                                <input type="date" id="start-date" class="date-input">
+                                <span class="date-separator">to</span>
+                                <input type="date" id="end-date" class="date-input">
+                                <button id="apply-filter" class="btn btn-primary btn-sm">Apply</button>
+                                <button id="clear-filter" class="btn btn-outline btn-sm">Clear</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Bar Chart: Money Spent by Category (moved here, right after analytics) -->
+            <section class="card chart-card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <span class="icon">📊</span>
+                        Money Spent by Category
+                    </h2>
+                </div>
+                <div class="card-content">
+                    <div class="chart-container">
+                        <canvas id="bar-category-chart"></canvas>
+                        <div id="no-bar-category-data" class="no-data">No expenses to display</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Line Chart -->
+            <section class="card chart-card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <span class="icon">📈</span>
+                        Spending Trends
+                    </h2>
+                    <div class="chart-info">
+                        <span id="chart-period">Last 7 days</span>
+                        <span id="chart-total">Total: $0.00</span>
+                    </div>
+                </div>
+                <div class="card-content">
+                    <div class="chart-container">
+                        <canvas id="trend-chart"></canvas>
+                        <div id="no-trend-data" class="no-data">No data for selected period</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Category Pie Chart -->
+            <section class="card chart-card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <span class="icon">🥧</span>
+                        Expenses by Category
+                    </h2>
+                </div>
+                <div class="card-content">
+                    <div class="chart-container">
+                        <canvas id="category-chart"></canvas>
+                        <div id="no-category-data" class="no-data">No expenses to display</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Expense History -->
+            <section class="card history-card" id="history">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <span class="icon">📋</span>
+                        Expense History
+                    </h2>
+
+                    
+                    
+                    <div class="history-controls">
+                    <div class="date-filter-container" style="display: flex; align-items: center; gap: 0.75rem;">
+                        <input type="date" id="history-date-filter" class="date-input">
+                        <button id="history-date-filter-btn" class="btn btn-outline btn-sm">Filter by Date</button>
+                    </div>
+                    <div class="search-container">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" id="search-input" placeholder="Search expenses..." class="search-input">
+                    </div>
+                    <div class="sort-container">
+                        <select id="sort-select" class="sort-select">
+                            <option value="date-desc">Newest First</option>
+                            <option value="date-asc">Oldest First</option>
+                            <option value="amount-desc">Highest Amount</option>
+                            <option value="amount-asc">Lowest Amount</option>
+                            <option value="category">Category</option>
+                        </select>
+                    </div>
+                    </div>
+
+                    
+
+                </div>
+                <div class="card-content">
+                    <div class="filter-summary" id="filter-summary"></div>
+                                        <div id="expense-list" class="expense-list">
+                                                <table class="history-table" style="width:100%;border-collapse:collapse;">
+                                                    <thead>
+                                                        <tr>
+                                                            <th style="text-align:left;padding:0.7rem 0.5rem;">Description</th>
+                                                            <th style="text-align:left;padding:0.7rem 0.5rem;">Category</th>
+                                                            <th style="text-align:left;padding:0.7rem 0.5rem;">Date</th>
+                                                            <th style="text-align:left;padding:0.7rem 0.5rem;">Amount</th>
+                                                              <th style="text-align:left;padding:0.7rem 0.5rem;">Mode</th>
+                                                              <th style="text-align:left;padding:0.7rem 0.5rem;">Actions</th>
+                                                        </tr>
+                                                    </thead>
+                                                                                <tbody id="expense-list-tbody">
+                                                                                    <tr><td colspan="6" class="no-data">No expenses recorded yet</td></tr>
+                                                                                </tbody>
+                                                </table>
+                                        </div>
+                                        <div class="pagination" id="pagination"></div>
+                </div>
+            </section>
+
+                <!-- Settings Section (placeholder) -->
+                <section id="settings"></section>
+                <!-- Footer -->
+                <footer class="footer">
+                    <div class="footer-actions">
+                        <button id="export-csv" class="btn btn-outline">
+                            <span class="icon">📥</span>
+                            Export CSV
+                        </button>
+                        <button id="export-json" class="btn btn-outline">
+                            <span class="icon">📄</span>
+                            Export JSON
+                        </button>
+                        <button id="import-data" class="btn btn-outline">
+                            <span class="icon">📤</span>
+                            Import Data
+                        </button>
+                        <button id="reset-data" class="btn btn-outline btn-danger">
+                            <span class="icon">🔄</span>
+                            Reset Data
+                        </button>
+                    </div>
+                    <div class="footer-info">
+                        <span>© 2025 Advanced Expense Tracker</span>
+                        <span>|</span>
+                        <span id="data-info">0 expenses tracked</span>
+                    </div>
+                </footer>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Confirmation Modal -->
+    <div id="modal-overlay" class="modal-overlay hidden">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modal-title">Confirm Action</h3>
+            </div>
+            <div class="modal-content">
+                <p id="modal-message">Are you sure you want to proceed?</p>
+            </div>
+            <div class="modal-actions">
+                <button id="modal-cancel" class="btn btn-outline">Cancel</button>
+                <button id="modal-confirm" class="btn btn-danger">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden File Input for Import -->
+    <input type="file" id="file-import" accept=".json,.csv" class="hidden">
+
+    <script>
+    // Improved smooth scrolling for sidebar links with header offset and fallback
+    window.addEventListener('DOMContentLoaded', function() {
+      const header = document.querySelector('.header');
+      document.querySelectorAll('.sidebar-link').forEach(link => {
+        link.addEventListener('click', function(e) {
+          const href = this.getAttribute('href');
+          if (href && href.startsWith('#')) {
+            const target = document.querySelector(href);
+            if (target) {
+              e.preventDefault();
+              // Make sure the section is not display:none
+              target.style.display = '';
+              const headerHeight = header ? header.offsetHeight : 0;
+              const targetTop = target.getBoundingClientRect().top + window.pageYOffset - headerHeight - 8;
+              window.scrollTo({ top: targetTop, behavior: 'smooth' });
+              document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+              this.classList.add('active');
+            } else {
+              // fallback: scroll to top if section not found
+              e.preventDefault();
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+          }
+        });
+      });
+    });
+    </script>
+        <script src="script.js"></script>
+                <script>
+                // Simple auth guard and logout handler
+                document.addEventListener('DOMContentLoaded', function() {
+                    try {
+                        const logged = localStorage.getItem('loggedInUser');
+                        if (!logged) {
+                            // Not logged in -> send to login page
+                            if (!location.pathname.toLowerCase().endsWith('login.html')) {
+                                location.href = 'Login.html';
+                                return;
+                            }
+                        }
+                    } catch (e) { /* ignore */ }
+                    const logoutBtn = document.getElementById('logout-btn');
+                    if (logoutBtn) {
+                        logoutBtn.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            localStorage.removeItem('loggedInUser');
+                            location.href = 'Login.html';
+                        });
+                    }
+                });
+                </script>
+        <script>
+        // Render expense history table with category column
+            function renderExpenseHistoryTable(expenses) {
+                const tbody = document.getElementById('expense-list-tbody');
+                if (!tbody) return;
+                if (!expenses || expenses.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" class="no-data">No expenses recorded yet</td></tr>';
+                    return;
+                }
+                tbody.innerHTML = expenses.map(expense => `
+                    <tr>
+                        <td>${window.expenseTracker.escapeHtml(expense.description)}</td>
+                        <td>${window.expenseTracker.escapeHtml(expense.category)}</td>
+                        <td>${window.expenseTracker.formatDate(expense.date)}</td>
+                        <td>₹${parseFloat(expense.amount).toFixed(2)}</td>
+                                    <td>
+                                        ${expense.mode === 'Cash' ? '<span title="Cash" style="font-size:1.3em;">💵</span>' : ''}
+                                        ${expense.mode === 'Online' ? '<span title="Online" style="font-size:1.3em;">💳</span>' : ''}
+                                        <span style="margin-left:0.3em;color:#888;font-size:0.97em;vertical-align:middle;">${expense.mode ? window.expenseTracker.escapeHtml(expense.mode) : '-'}</span>
+                                    </td>
+                        <td>
+                            <button class="btn btn-outline btn-sm" onclick="expenseTracker.editExpense('${expense.id}')" title="Edit expense">✏️</button>
+                            <button class="btn btn-danger btn-sm" onclick="expenseTracker.deleteExpense('${expense.id}')" title="Delete expense">🗑️</button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+        // Patch expenseTracker.renderExpenseList to use the new table
+        if (window.expenseTracker) {
+            const origRenderExpenseList = window.expenseTracker.renderExpenseList.bind(window.expenseTracker);
+            window.expenseTracker.renderExpenseList = function() {
+                let filtered = this.getFilteredExpenses();
+                // Apply search filter
+                if (this.searchTerm) {
+                    const term = this.searchTerm.toLowerCase();
+                    filtered = filtered.filter(exp =>
+                        exp.description.toLowerCase().includes(term) ||
+                        exp.category.toLowerCase().includes(term)
+                    );
+                }
+                // Apply sorting
+                filtered = this.sortExpenses(filtered);
+                // Pagination calculations
+                const totalPages = Math.ceil(filtered.length / this.itemsPerPage);
+                if (this.currentPage > totalPages) this.currentPage = totalPages > 0 ? totalPages : 1;
+                const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+                const paginatedExpenses = filtered.slice(startIndex, startIndex + this.itemsPerPage);
+                renderExpenseHistoryTable(paginatedExpenses);
+                this.renderPagination(totalPages, filtered.length);
+            };
+            // Initial render
+            window.expenseTracker.renderExpenseList();
+        }
+        </script>
+    <script>
+    // Bar Chart: Money Spent by Category (below Expense Analytics)
+    document.addEventListener('DOMContentLoaded', function() {
+      if (!window.expenseTracker) return;
+      const ctx = document.getElementById('bar-category-chart')?.getContext('2d');
+      const noDataMessage = document.getElementById('no-bar-category-data');
+      if (!ctx || !noDataMessage) return;
+
+      function renderBarCategoryChart() {
+        const categoryData = window.expenseTracker.getCategoryData();
+        const labels = Object.keys(categoryData);
+        const data = Object.values(categoryData);
+        if (labels.length === 0) {
+          noDataMessage.style.display = 'flex';
+          ctx.canvas.style.display = 'none';
+          return;
+        }
+        noDataMessage.style.display = 'none';
+        ctx.canvas.style.display = 'block';
+        if (window.barCategoryChart) window.barCategoryChart.destroy();
+        window.barCategoryChart = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels,
+            datasets: [{
+              label: 'Money Spent',
+              data,
+              backgroundColor: '#3b82f6',
+              borderColor: '#1e293b',
+              borderWidth: 2,
+              borderRadius: 8,
+              maxBarThickness: 38
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                callbacks: {
+                  label: (context) => `₹${context.parsed.y.toFixed(2)}`
+                }
+              }
+            },
+            scales: {
+              x: {
+                title: { display: true, text: 'Category', color: '#64748b', font: { weight: 'bold' } },
+                ticks: { color: '#64748b' },
+                grid: { color: '#e2e8f0', drawBorder: false }
+              },
+              y: {
+                title: { display: true, text: 'Money Spent (₹)', color: '#64748b', font: { weight: 'bold' } },
+                ticks: { color: '#64748b', callback: value => `₹${value}` },
+                grid: { color: '#e2e8f0', drawBorder: false }
+              }
+            },
+            animation: { duration: 1000, easing: 'easeInOutQuart' }
+          }
+        });
+      }
+      // Initial render
+      renderBarCategoryChart();
+      // Re-render when expenses change
+      const origRenderCategoryChart = window.expenseTracker.renderCategoryChart.bind(window.expenseTracker);
+      window.expenseTracker.renderCategoryChart = function() {
+        origRenderCategoryChart();
+        renderBarCategoryChart();
+      };
+    });
+    </script>
+</body>
+<!-- Cash with wings follower -->
+<div id="cash-fly" style="
+  position: fixed;
+  left: 0; top: 0;
+  pointer-events: none;
+  z-index: 9999;
+  font-size: 2.5rem;
+  user-select: none;
+  transition: filter 0.2s;
+">💸</div>
+<script>
+  // Cash with wings emoji follows cursor with lag
+  (function() {
+    const cash = document.getElementById('cash-fly');
+    let mouseX = window.innerWidth / 2, mouseY = window.innerHeight / 2;
+    let cashX = mouseX, cashY = mouseY;
+    const lag = 0.02; // Strong lag for trailing effect
+    // Fluttering effect: alternate between two emoji variants
+    const frames = ['💸', '💸']; // fallback if no alt, but will rotate
+    // Use CSS rotate for fluttering effect
+    let flutter = 0;
+    function animate() {
+      cashX += (mouseX - cashX) * lag;
+      cashY += (mouseY - cashY) * lag;
+      // Flutter: rotate back and forth
+      flutter += 0.08; // SLOW flutter
+      const angle = Math.sin(flutter) * 18; // degrees
+      cash.style.transform = `translate(-50%, -50%) translate(${cashX}px, ${cashY}px) rotate(${angle}deg)`;
+      requestAnimationFrame(animate);
+    }
+    window.addEventListener('mousemove', e => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+    });
+    // Start centered
+    cash.style.transform = `translate(-50%, -50%) translate(${cashX}px, ${cashY}px)`;
+    animate();
+  })();
+</script>
+</body>
+
+</html>
